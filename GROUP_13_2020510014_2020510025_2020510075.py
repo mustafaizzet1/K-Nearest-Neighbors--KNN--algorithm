@@ -3,6 +3,7 @@ import tkinter as tk
 
 data = [] #extracted first 8 column data from csv
 outcome = [] #extracted outcome from csv
+
 v_0=[]
 v_1=[]
 v_2=[]
@@ -48,6 +49,7 @@ v_5 = list(map(float, v_5))
 v_6 = list(map(float, v_6))
 v_7 = list(map(float, v_7))
 
+
 v_0_max=max(v_0)
 v_1_max=max(v_1)
 v_2_max=max(v_2)
@@ -56,6 +58,36 @@ v_4_max=max(v_4)
 v_5_max=max(v_5)
 v_6_max=max(v_6)
 v_7_max=max(v_7)
+v_max=[]
+
+v_max.append(v_0_max)
+v_max.append(v_1_max)
+v_max.append(v_2_max)
+v_max.append(v_3_max)
+v_max.append(v_4_max)
+v_max.append(v_5_max)
+v_max.append(v_6_max)
+v_max.append(v_7_max)
+
+
+v_0_min=min(v_0)
+v_1_min=min(v_1)
+v_2_min=min(v_2)
+v_3_min=min(v_3)
+v_4_min=min(v_4)
+v_5_min=min(v_5)
+v_6_min=min(v_6)
+v_7_min=min(v_7)
+
+v_min=[]
+v_min.append(v_0_min)
+v_min.append(v_1_min)
+v_min.append(v_2_min)
+v_min.append(v_3_min)
+v_min.append(v_4_min)
+v_min.append(v_5_min)
+v_min.append(v_6_min)
+v_min.append(v_7_min)
 
 
 for i in range(8):
@@ -80,12 +112,12 @@ def writingtocsv(data_preprocessed):
 def standardization_calculation(list1,max_value,min_value):
     data_preprocessed = []
     list0 = []
-    for value in list1:
-        if isinstance(value, list):
-            list0.append((value - min_value) / (max_value - min_value))  # calculation for standardization
+    for value in range(len(list1)):
+        if isinstance(list1[value], list):
+            list0.append((list1[value] - v_min[value]) / (v_max[value] - v_min[value]))  # calculation for standardization
             data_preprocessed.append(list0)
         else:
-            data_preprocessed.append((value - min_value) / (max_value - min_value))
+            data_preprocessed.append((list1[value] - v_min[value]) / (v_max[value] - v_min[value]))
     return data_preprocessed
 
 def preprocessing(dat):
@@ -111,10 +143,6 @@ def preprocessing(dat):
 
 def euclidean_distance(point1,point2):
     squared_diff_sum = 0
-    if len(point1) != len(point2):
-        return print("Points must have the same dimension")
-		
-	
     for i in range(len(point1)):
         squared_diff_sum += (point1[i] - point2[i]) ** 2
 
@@ -131,9 +159,11 @@ def knn(point2,data_preprocessed,outcome,num):
 
 def validation(str_list):
     try:
+        print(len(data))
         int_list = [float(x) for x in str_list]
-        if (v_0_max >= int_list[0] and v_1_max >= int_list[1] and v_2_max >= int_list[2] and v_3_max >= int_list[3] and v_4_max >= int_list[4] and
-            v_4_max >= int_list[4] and v_5_max >= int_list[5] and v_6_max >= int_list[6] and v_7_max >= int_list[7]):
+        print(int_list)
+        if (v_0_max >= int_list[0] and v_1_max >= int_list[1] and v_2_max >= int_list[2] and v_3_max >= int_list[3] and
+            v_4_max >= int_list[4] and v_5_max >= int_list[5] and v_6_max >= int_list[6] and v_7_max >= int_list[7] and int_list[8] <= len(data)):
             print("truee")
             return int_list
         else:
@@ -177,13 +207,18 @@ def diabet_result(dictionary):
     #return percentage_dict
 
 def process_inputs():
+
+    test_data = preprocessing(data)
+    writingtocsv(test_data)
     inputs = validation(get_inputs())
     if inputs is None:
         result_label.config(text="Error: One or more inputs are not valid numbers.")
         return
+    num = int(inputs[8])
+    inputs.pop(8)
     preprocessed_data = preprocessing(inputs)
-    test_data = preprocessing(data)
-    result = knn(preprocessed_data,test_data,  outcome,5)
+
+    result = knn(preprocessed_data,test_data,  outcome,num)
     result=diabet_result(result)
     return result
 
@@ -191,9 +226,9 @@ def process_inputs():
 root = tk.Tk()
 root.title("Multiple Inputs GUI")
 root.geometry("300x400")
-
 # Create entry widgets for eight inputs
 entries = []
+variables.append("The number of closest records")
 for i in variables:
     label = tk.Label(root, text=f"{i}:")
     label.pack()
@@ -207,7 +242,7 @@ def display_result():
 
 # Create a button to get the inputs and display result
 
-button = tk.Button(root, text="Get Inputs and Display Result", command=display_result,height=2, width=24)
+button = tk.Button(root, text="Get Inputs and Display Result", command=display_result)
 button.pack()
 
 # Create a label to display the result
